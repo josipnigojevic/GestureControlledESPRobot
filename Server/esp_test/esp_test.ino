@@ -4,7 +4,7 @@
 // REPLACE WITH RECEIVER MAC Address
 // 94:B9:7E:EA:81:04
 uint8_t broadcastAddress[] = {0x94, 0xB9, 0x7E, 0xEA, 0x81, 0x04};
-
+const int SOFT_POT_PIN = A0;
 // Structure example to send data
 // Must match the receiver structure
 typedef struct struct_message {
@@ -15,7 +15,7 @@ int x;
 struct_message myData;
 
 unsigned long lastTime = 0;  
-unsigned long timerDelay = 2000;  // send readings timer
+unsigned long timerDelay = 20;  // send readings timer
 
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
@@ -31,7 +31,7 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
 void setup() {
   // Init Serial Monitor
   Serial.begin(115200);
- 
+  pinMode(SOFT_POT_PIN, INPUT);
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -52,8 +52,8 @@ void setup() {
  
 void loop() {
   if ((millis() - lastTime) > timerDelay) {
-    // Set values to send
-    myData.x = random(0,10);
+     
+    myData.x = analogRead(SOFT_POT_PIN);;
 
     // Send message via ESP-NOW
     esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));

@@ -11,6 +11,13 @@
 
 #include <esp_now.h>
 #include <WiFi.h>
+#include <ESP32Servo.h>
+
+Servo myservo;
+// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
+// Possible PWM GPIO pins on the ESP32-S2: 0(used by on-board button),1-17,18(used by on-board LED),19-21,26,33-42
+
+int servoPin = 26;
 
 //Structure example to receive data
 //Must match the sender structure
@@ -33,7 +40,12 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 void setup() {
   //Initialize Serial Monitor
   Serial.begin(115200);
-  
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 18 to the servo object
   //Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -49,5 +61,9 @@ void setup() {
 }
  
 void loop() {
-
+if(myData.x > 50){
+  myservo.write(120); 
+  }else{
+    myservo.write(30); 
+    }
 }
